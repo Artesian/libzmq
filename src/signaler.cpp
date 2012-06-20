@@ -234,22 +234,23 @@ int zmq::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
 
 #elif defined ZMQ_HAVE_WINDOWS
 
-    //  This function has to be in a system-wide critical section so that
-    //  two instances of the library don't accidentally create signaler
-    //  crossing the process boundary.
-    //  We'll use named event object to implement the critical section.
-    //  Note that if the event object already exists, the CreateEvent requests
-    //  EVENT_ALL_ACCESS access right. If this fails, we try to open
-    //  the event object asking for SYNCHRONIZE access only.
-    HANDLE sync = CreateEvent (NULL, FALSE, TRUE, TEXT ("zmq-signaler-port-sync"));
-    if (sync == NULL && GetLastError () == ERROR_ACCESS_DENIED)
-      sync = OpenEvent (SYNCHRONIZE, FALSE, TEXT ("zmq-signaler-port-sync"));
+    // HACK: To work around permissions problems when running process via IIS
+    ////  This function has to be in a system-wide critical section so that
+    ////  two instances of the library don't accidentally create signaler
+    ////  crossing the process boundary.
+    ////  We'll use named event object to implement the critical section.
+    ////  Note that if the event object already exists, the CreateEvent requests
+    ////  EVENT_ALL_ACCESS access right. If this fails, we try to open
+    ////  the event object asking for SYNCHRONIZE access only.
+    //HANDLE sync = CreateEvent (NULL, FALSE, TRUE, TEXT ("zmq-signaler-port-sync"));
+    //if (sync == NULL && GetLastError () == ERROR_ACCESS_DENIED)
+    //  sync = OpenEvent (SYNCHRONIZE, FALSE, TEXT ("zmq-signaler-port-sync"));
 
-    win_assert (sync != NULL);
+    //win_assert (sync != NULL);
 
-    //  Enter the critical section.
-    DWORD dwrc = WaitForSingleObject (sync, INFINITE);
-    zmq_assert (dwrc == WAIT_OBJECT_0);
+    ////  Enter the critical section.
+    //DWORD dwrc = WaitForSingleObject (sync, INFINITE);
+    //zmq_assert (dwrc == WAIT_OBJECT_0);
 
     //  Windows has no 'socketpair' function. CreatePipe is no good as pipe
     //  handles cannot be polled on. Here we create the socketpair by hand.
@@ -313,9 +314,10 @@ int zmq::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
     rc = closesocket (listener);
     wsa_assert (rc != SOCKET_ERROR);
 
-    //  Exit the critical section.
-    brc = SetEvent (sync);
-    win_assert (brc != 0);
+    // HACK: To work around permissions problems when running process via IIS
+    ////  Exit the critical section.
+    //brc = SetEvent (sync);
+    //win_assert (brc != 0);
 
     return 0;
 
