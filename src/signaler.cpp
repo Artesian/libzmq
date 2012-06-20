@@ -241,9 +241,24 @@ int zmq::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
     //  Note that if the event object already exists, the CreateEvent requests
     //  EVENT_ALL_ACCESS access right. If this fails, we try to open
     //  the event object asking for SYNCHRONIZE access only.
-    HANDLE sync = CreateEvent (NULL, FALSE, TRUE, TEXT ("zmq-signaler-port-sync"));
+
+    //  Make the following critical section accessible to everyone.
+    SECURITY_ATTRIBUTES sa = {0};
+    sa.nLength = sizeof (sa);
+    sa.bInheritHandle = FALSE;
+    SECURITY_DESCRIPTOR sd;
+    BOOL ok = InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
+    win_assert (ok);
+    ok = SetSecurityDescriptorDacl(&sd, TRUE, (PACL) NULL, FALSE);
+    win_assert (ok);
+    sa.lpSecurityDescriptor = &sd;
+
+    //  This function has to be in a system-wide critical section so that
+    //  two instances of the library don't accidentally create signaler
+    //  crossing the process boundary.
+    HANDLE sync = CreateEvent (&sa, FALSE, TRUE, "zmq-signaler-port-sync");
     if (sync == NULL && GetLastError () == ERROR_ACCESS_DENIED)
-      sync = OpenEvent (SYNCHRONIZE, FALSE, TEXT ("zmq-signaler-port-sync"));
+     sync = OpenEvent (SYNCHRONIZE, FALSE, TEXT ("zmq-signaler-port-sync"));
 
     win_assert (sync != NULL);
 

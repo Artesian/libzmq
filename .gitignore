@@ -69,3 +69,5 @@ foreign/openpgm/*
 !foreign/openpgm/Makefile.am
 zeromq-*.tar.gz
 zeromq-*.zip
+_ReSharper.*/
+*.TeamCity.user
