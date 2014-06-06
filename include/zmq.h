@@ -130,6 +130,9 @@ ZMQ_EXPORT void zmq_version (int *major, int *minor, int *patch);
 #ifndef EHOSTUNREACH
 #define EHOSTUNREACH (ZMQ_HAUSNUMERO + 17)
 #endif
+#ifndef ENETRESET
+#define ENETRESET (ZMQ_HAUSNUMERO + 18)
+#endif
 
 /*  Native 0MQ error codes.                                                   */
 #define EFSM (ZMQ_HAUSNUMERO + 51)
@@ -339,6 +342,8 @@ ZMQ_EXPORT int zmq_sendmsg (void *s, zmq_msg_t *msg, int flags);
 ZMQ_EXPORT int zmq_recvmsg (void *s, zmq_msg_t *msg, int flags);
 
 /*  Experimental                                                              */
+struct iovec;
+
 ZMQ_EXPORT int zmq_sendiov (void *s, struct iovec *iov, size_t count, int flags);
 ZMQ_EXPORT int zmq_recviov (void *s, struct iovec *iov, size_t *count, int flags);
 

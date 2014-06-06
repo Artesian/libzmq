@@ -371,12 +371,11 @@ zmq::tcp_address_t::tcp_address_t (const sockaddr *sa, socklen_t sa_len)
     zmq_assert(sa && sa_len > 0);
 
     memset (&address, 0, sizeof (address));
-    if (sa->sa_family == AF_INET && sa_len >= (socklen_t) sizeof (address.ipv4)) {
+    if (sa->sa_family == AF_INET && sa_len >= (socklen_t) sizeof (address.ipv4))
         memcpy(&address.ipv4, sa, sizeof (address.ipv4));
-    }
-    else if (sa->sa_family == AF_INET6 && sa_len >= (socklen_t) sizeof (address.ipv6)) {
+    else 
+    if (sa->sa_family == AF_INET6 && sa_len >= (socklen_t) sizeof (address.ipv6))
         memcpy(&address.ipv6, sa, sizeof (address.ipv6));
-    }
 }
 
 zmq::tcp_address_t::~tcp_address_t ()
