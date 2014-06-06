@@ -71,3 +71,4 @@ zeromq-*.tar.gz
 zeromq-*.zip
 _ReSharper.*/
 *.TeamCity.user
+builds/msvc/msvc10.sdf
